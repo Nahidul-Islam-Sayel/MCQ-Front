@@ -39,7 +39,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 const App: React.FC = () => {
   const [login, setLogin] = useState(false);
   const [checkadminlogin, setCheckAdminLogin] = useState(false);
-  const isAdminLoggedIn = localStorage.getItem("AdminLogin"); // string|null
+  const isAdminLoggedIn = localStorage.getItem("adminlogin"); // string|null
   const isLogin = localStorage.getItem("userid"); // string|null
 
   return (

@@ -79,6 +79,7 @@ const AdminLoginForm: React.FC = () => {
           timer: 2000,
           showConfirmButton: false,
         });
+        localStorage.setItem("adminlogin", "true");
         setCheckAdminLogin(true);
         setTimeout(() => {
           navigate("/adminhome");
