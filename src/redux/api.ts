@@ -52,7 +52,7 @@ export const api = createApi({
         method: "GET",
         params: { step, level },
       }),
-      providesTags: (result, error, arg) =>
+      providesTags: (result) =>
         result
           ? [
               ...result.map(({ _id }) => ({
@@ -70,7 +70,7 @@ export const api = createApi({
         method: "GET",
         params: { step, level },
       }),
-      providesTags: (result, error, arg) => [
+      providesTags: (_result, _error, arg) => [
         { type: "Count", id: `${arg.step}-${arg.level}` },
       ],
       transformResponse: (response: { count: number }) => response.count,

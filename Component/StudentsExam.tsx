@@ -141,7 +141,7 @@ export default function MCQStudentTestPage(): JSX.Element {
     setLocked((prev) => ({ ...prev, [q._id]: true }));
 
     if (currentIndex === questions.length - 1) {
-      handleSubmit(true);
+      handleSubmit();
       return;
     }
 
@@ -185,7 +185,7 @@ export default function MCQStudentTestPage(): JSX.Element {
   };
 
   // New SweetAlert2 powered submit handler with modal input for name and confirm modal
-  const handleSubmit = async (auto = false) => {
+  const handleSubmit = async () => {
     if (questionTimerRef.current) {
       clearInterval(questionTimerRef.current);
       questionTimerRef.current = null;
@@ -544,7 +544,7 @@ export default function MCQStudentTestPage(): JSX.Element {
           </button>
           <button
             onClick={async () => {
-              await handleSubmit(false);
+              await handleSubmit();
             }}
             className="px-4 py-2 bg-green-600 text-white rounded text-base sm:text-lg md:text-xl"
           >

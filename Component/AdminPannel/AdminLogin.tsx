@@ -13,7 +13,7 @@ const AdminLoginForm: React.FC = () => {
   if (!context) {
     throw new Error("userContext must be used within a userContext.Provider");
   }
-  const [setCheckAdminLogin] = context;
+  const [, setCheckAdminLogin] = context;
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
