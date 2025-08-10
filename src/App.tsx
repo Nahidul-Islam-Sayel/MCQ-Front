@@ -1,4 +1,5 @@
-import { createContext, useState } from "react";
+import type { ReactNode } from "react";
+import React, { useState } from "react";
 import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
 import AdminHome from "../Component/AdminPannel/AdminDashboard";
 import AdminLogin from "../Component/AdminPannel/AdminLogin";
@@ -8,21 +9,38 @@ import Navbar from "../Component/Navbar";
 import Singup from "../Component/SignUp";
 import StudentsExam from "../Component/StudentsExam";
 import StudentsProfile from "../Component/StudentsProfile";
+import { userContext } from "./context/userContext";
+// Define the shape of your context value
 
-export const userContext = createContext();
+// Create context with a default value or undefined
 
-const ProtectedRoute = ({ isAllowed, redirectPath = "/login", children }) => {
-  if (!isAllowed) {
+// Props for ProtectedRoute
+interface ProtectedRouteProps {
+  isAllowed: boolean | string | null; // since you use localStorage values (string | null), widen type here
+  redirectPath?: string;
+  children: ReactNode;
+}
+
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  isAllowed,
+  redirectPath = "/login",
+  children,
+}) => {
+  // Treat localStorage strings as boolean flags:
+  const allowed =
+    typeof isAllowed === "boolean" ? isAllowed : Boolean(isAllowed);
+
+  if (!allowed) {
     return <Navigate to={redirectPath} replace />;
   }
-  return children;
+  return <>{children}</>;
 };
 
-const App = () => {
+const App: React.FC = () => {
   const [login, setLogin] = useState(false);
   const [checkadminlogin, setCheckAdminLogin] = useState(false);
-  const isAdminLoggedIn = localStorage.getItem("AdminLogin");
-  const isLogin = localStorage.getItem("userid");
+  const isAdminLoggedIn = localStorage.getItem("AdminLogin"); // string|null
+  const isLogin = localStorage.getItem("userid"); // string|null
 
   return (
     <userContext.Provider

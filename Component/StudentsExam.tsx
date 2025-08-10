@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type JSX } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
 
@@ -28,6 +28,7 @@ export default function MCQStudentTestPage(): JSX.Element {
   const questionTimerRef = useRef<number | null>(null);
   const lockAdvanceCalledRef = useRef(false);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [submittedResult, setSubmittedResult] = useState<any>(null);
   const [name, setName] = useState<string>(
     () => localStorage.getItem("username") || ""

@@ -2,13 +2,18 @@ import React, { useContext, useEffect, useState } from "react";
 import { HiMenu, HiX } from "react-icons/hi";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import { userContext } from "../src/App";
+import { userContext } from "../src/context/userContext";
 const primaryColor = "#122048";
 
 const Navbar: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [login, setLogin] = useContext(userContext);
+  const context = useContext(userContext);
+  if (!context) {
+    throw new Error("userContext must be used within its Provider");
+  }
+  const [login, setLogin] = context;
+
   const navigate = useNavigate();
   const location = useLocation();
 

@@ -2,15 +2,18 @@ import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { userContext } from "../../src/App";
+import { userContext } from "../../src/context/userContext";
 const MySwal = withReactContent(Swal);
 const primaryColor = "#122048";
 
 const AdminLoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [login, setLogin, checkadminlogin, setCheckAdminLogin] =
-    useContext(userContext);
+  const context = useContext(userContext);
+  if (!context) {
+    throw new Error("userContext must be used within a userContext.Provider");
+  }
+  const [login, setLogin, checkadminlogin, setCheckAdminLogin] = context;
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;

@@ -2,14 +2,13 @@ import { skipToken } from "@reduxjs/toolkit/query/react";
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-
+import type { Question } from "../../src/redux/api";
 import {
-  Question,
   useAddQuestionMutation,
   useDeleteQuestionMutation,
   useGetQuestionsQuery,
   useUpdateQuestionMutation,
-} from "../../src/redux/Api"; // Adjust path accordingly
+} from "../../src/redux/api"; // Adjust path accordingly
 
 const MySwal = withReactContent(Swal);
 

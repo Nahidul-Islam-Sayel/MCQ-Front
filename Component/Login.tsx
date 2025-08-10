@@ -3,15 +3,17 @@ import { FaEnvelope, FaLock } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-import { userContext } from "../src/App";
 import loginImg from "../src/assets/HomePage/HeroImage.jpg";
+import { userContext } from "../src/context/userContext";
+
 const MySwal = withReactContent(Swal);
 const primaryColor = "#122048";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [login, setLogin] = useContext(userContext);
+  // Added non-null assertion to satisfy TS if context might be undefined
+  const [login, setLogin] = useContext(userContext)!;
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -54,8 +56,10 @@ const Login: React.FC = () => {
         timerProgressBar: true,
         showConfirmButton: false,
       });
-    } catch (err) {
-      console.error(err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
       setError("Invalid credentials");
       setLoading(false);
     }
@@ -85,8 +89,9 @@ const Login: React.FC = () => {
       }
 
       const { accessToken, userid } = data;
-      localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("userid", userid);
+      if (typeof accessToken === "string")
+        localStorage.setItem("accessToken", accessToken);
+      if (typeof userid === "string") localStorage.setItem("userid", userid);
 
       await MySwal.fire({
         icon: "success",
@@ -100,8 +105,10 @@ const Login: React.FC = () => {
       setLoading(false);
       setLogin(true);
       navigate("/profile");
-    } catch (err) {
-      console.error(err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error(err.message);
+      }
       setError("Server error during OTP verification");
       setLoading(false);
     }
@@ -301,8 +308,10 @@ const Login: React.FC = () => {
         timerProgressBar: true,
         showConfirmButton: false,
       });
-    } catch (err) {
-      console.error("Forgot password flow error:", err);
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error("Forgot password flow error:", err.message);
+      }
       await MySwal.fire({
         icon: "error",
         title: "Error",
