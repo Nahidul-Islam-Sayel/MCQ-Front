@@ -154,7 +154,6 @@ const SignUp: React.FC = () => {
 
     setSigningUp(true);
     try {
-      console.log("Hello");
       const res = await fetch(`${API_BASE}/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -169,7 +168,6 @@ const SignUp: React.FC = () => {
       });
 
       const data = await res.json();
-      console.log(data);
       if (res.ok && data.success) {
         MySwal.fire({
           icon: "success",

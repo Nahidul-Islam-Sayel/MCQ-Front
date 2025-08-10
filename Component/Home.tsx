@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { FaCertificate, FaGraduationCap, FaShieldAlt } from "react-icons/fa";
 import img1 from "../src/assets/HomePage/HeroImage.jpg";
 
@@ -34,6 +34,24 @@ const AnimatedCount: React.FC<{
 };
 
 const Home: React.FC = () => {
+  const didRun = useRef(false); // prevent double-run in dev mode
+
+  useEffect(() => {
+    if (didRun.current) return;
+    didRun.current = true;
+
+    // Track IP
+    fetch("https://api.ipify.org?format=json")
+      .then((res) => res.json())
+      .then((data) => {
+        fetch("http://localhost:5000/SingUpAdmin/track-visit", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ip: data.ip }),
+        });
+      });
+  }, []);
+
   return (
     <div className="font-sans text-gray-800">
       {/* Hero Section */}
@@ -54,7 +72,10 @@ const Home: React.FC = () => {
       </section>
 
       {/* Features */}
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-20 bg-white">
+      <section
+        className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-20 bg-white"
+        id="features"
+      >
         <h2
           className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-center mb-10 sm:mb-12 md:mb-14"
           style={{ color: primaryColor }}
@@ -102,7 +123,10 @@ const Home: React.FC = () => {
       </section>
 
       {/* Certification Steps */}
-      <section className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-20 bg-[#f0f4ff]">
+      <section
+        className="py-12 sm:py-16 md:py-20 px-4 sm:px-6 md:px-20 bg-[#f0f4ff]"
+        id="certification"
+      >
         <h2
           className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-center mb-10 sm:mb-12 md:mb-14"
           style={{ color: primaryColor }}

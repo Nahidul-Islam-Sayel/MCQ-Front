@@ -59,7 +59,7 @@ export default function CertificationSetupWithAPI() {
       const counts: Record<string, number> = {};
       await Promise.all(
         ASSESSMENT_FLOW.map(async (item) => {
-          // Using useGetCountQuery in hooks is not possible here, so fallback to axios manually or a helper function:
+          // Using fetch manually because RTK Query can't be used outside hooks here
           const resp = await fetch(
             `http://localhost:5000/AdminAddQuestion/count?step=${item.step}&level=${item.level}`
           );
@@ -183,63 +183,87 @@ export default function CertificationSetupWithAPI() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-8">
+    <div className="max-w-6xl mx-auto p-4 sm:p-6 space-y-8">
       <h1 className="text-3xl font-bold mb-6 text-center">
         Certification Mapping & Questions
       </h1>
 
-      <table className="w-full border border-gray-300 border-collapse">
-        <thead className="bg-gray-100">
-          <tr>
-            <th className="border border-gray-300 p-2">Step</th>
-            <th className="border border-gray-300 p-2">Level</th>
-            <th className="border border-gray-300 p-2">Score Range</th>
-            <th className="border border-gray-300 p-2">Certification</th>
-            <th className="border border-gray-300 p-2">Add Question</th>
-            <th className="border border-gray-300 p-2">View Questions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {ASSESSMENT_FLOW.map((it) => {
-            const cnt = countMap[keyFor(it.step, it.level)] ?? 0;
-            const canAdd = cnt < 22;
-            return (
-              <tr key={`${it.step}-${it.level}`} className="text-center">
-                <td className="border border-gray-300 p-2">{it.step}</td>
-                <td className="border border-gray-300 p-2">{it.level}</td>
-                <td className="border border-gray-300 p-2">{it.passRange}</td>
-                <td className="border border-gray-300 p-2">{it.certified}</td>
-                <td className="border border-gray-300 p-2">
-                  <button
-                    disabled={!canAdd}
-                    onClick={() => openAddModal(it.step, it.level)}
-                    className={`px-3 py-1 rounded text-white ${
-                      canAdd
-                        ? "bg-blue-600 hover:bg-blue-700"
-                        : "bg-gray-400 cursor-not-allowed"
-                    }`}
-                  >
-                    Add Question
-                  </button>
-                  <div className="text-xs mt-1">({cnt}/22)</div>
-                </td>
-                <td className="border border-gray-300 p-2">
-                  <button
-                    onClick={() => handleView(it.step, it.level)}
-                    className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-700"
-                  >
-                    View Questions
-                  </button>
-                </td>
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
+      <div className="overflow-x-auto">
+        <table className="w-full border border-gray-300 border-collapse min-w-[600px]">
+          <thead className="bg-gray-100">
+            <tr>
+              <th className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                Step
+              </th>
+              <th className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                Level
+              </th>
+              <th className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                Score Range
+              </th>
+              <th className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                Certification
+              </th>
+              <th className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                Add Question
+              </th>
+              <th className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                View Questions
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            {ASSESSMENT_FLOW.map((it) => {
+              const cnt = countMap[keyFor(it.step, it.level)] ?? 0;
+              const canAdd = cnt < 22;
+              return (
+                <tr key={`${it.step}-${it.level}`} className="text-center">
+                  <td className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                    {it.step}
+                  </td>
+                  <td className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                    {it.level}
+                  </td>
+                  <td className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                    {it.passRange}
+                  </td>
+                  <td className="border border-gray-300 p-2 text-xs sm:text-sm md:text-base">
+                    {it.certified}
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    <button
+                      disabled={!canAdd}
+                      onClick={() => openAddModal(it.step, it.level)}
+                      className={`w-full sm:w-auto px-2 sm:px-3 py-1 rounded text-white transition-colors ${
+                        canAdd
+                          ? "bg-blue-600 hover:bg-blue-700"
+                          : "bg-gray-400 cursor-not-allowed"
+                      } text-xs sm:text-sm md:text-base`}
+                    >
+                      <span className="inline sm:hidden">Add</span>
+                      <span className="hidden sm:inline">Add Question</span>
+                    </button>
+                    <div className="text-[10px] mt-1">({cnt}/22)</div>
+                  </td>
+                  <td className="border border-gray-300 p-2">
+                    <button
+                      onClick={() => handleView(it.step, it.level)}
+                      className="w-full sm:w-auto bg-green-600 text-white px-2 sm:px-3 py-1 rounded hover:bg-green-700 transition-colors text-xs sm:text-sm md:text-base"
+                    >
+                      <span className="inline sm:hidden">View</span>
+                      <span className="hidden sm:inline">View Questions</span>
+                    </button>
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
 
       {/* View panel */}
       {viewStep && viewLevel && (
-        <section className="mt-6 bg-white p-4 rounded shadow-sm">
+        <section className="mt-6 bg-white p-4 rounded shadow-sm overflow-x-auto">
           <h2 className="text-xl mb-3 font-semibold">
             Questions for Step {viewStep} - Level {viewLevel}
           </h2>
@@ -249,59 +273,75 @@ export default function CertificationSetupWithAPI() {
           ) : questions.length === 0 ? (
             <p>No questions for this step & level yet.</p>
           ) : (
-            <table className="w-full border-collapse border border-gray-300">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="border p-2">#</th>
-                  <th className="border p-2">Question</th>
-                  <th className="border p-2">Options</th>
-                  <th className="border p-2">Correct</th>
-                  <th className="border p-2">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                {questions.map((q, idx) => (
-                  <tr key={q._id || idx}>
-                    <td className="border p-2 text-center">{idx + 1}</td>
-                    <td className="border p-2">{q.questionText}</td>
-                    <td className="border p-2">
-                      <ol className="list-decimal list-inside">
-                        {q.options.map((o, i) => (
-                          <li
-                            key={i}
-                            className={
-                              i === q.correctOptionIndex
-                                ? "font-bold text-green-600"
-                                : ""
-                            }
-                          >
-                            {o}
-                          </li>
-                        ))}
-                      </ol>
-                    </td>
-                    <td className="border p-2 text-center">
-                      Option {q.correctOptionIndex + 1}
-                    </td>
-                    <td className="border p-2 text-center space-x-2">
-                      <button
-                        onClick={() => openEditModal(q)}
-                        className="bg-yellow-500 px-2 py-1 rounded hover:bg-yellow-600"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDelete(q._id)}
-                        className="bg-red-600 px-2 py-1 rounded hover:bg-red-700 text-white"
-                        disabled={deleting}
-                      >
-                        Delete
-                      </button>
-                    </td>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse border border-gray-300 min-w-[600px]">
+                <thead className="bg-gray-100">
+                  <tr>
+                    <th className="border p-2 text-xs sm:text-sm md:text-base">
+                      #
+                    </th>
+                    <th className="border p-2 text-xs sm:text-sm md:text-base">
+                      Question
+                    </th>
+                    <th className="border p-2 text-xs sm:text-sm md:text-base">
+                      Options
+                    </th>
+                    <th className="border p-2 text-xs sm:text-sm md:text-base">
+                      Correct
+                    </th>
+                    <th className="border p-2 text-xs sm:text-sm md:text-base">
+                      Actions
+                    </th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {questions.map((q, idx) => (
+                    <tr key={q._id || idx}>
+                      <td className="border p-2 text-center text-xs sm:text-sm md:text-base">
+                        {idx + 1}
+                      </td>
+                      <td className="border p-2 text-xs sm:text-sm md:text-base">
+                        {q.questionText}
+                      </td>
+                      <td className="border p-2 text-xs sm:text-sm md:text-base">
+                        <ol className="list-decimal list-inside">
+                          {q.options.map((o, i) => (
+                            <li
+                              key={i}
+                              className={
+                                i === q.correctOptionIndex
+                                  ? "font-bold text-green-600"
+                                  : ""
+                              }
+                            >
+                              {o}
+                            </li>
+                          ))}
+                        </ol>
+                      </td>
+                      <td className="border p-2 text-center text-xs sm:text-sm md:text-base">
+                        Option {q.correctOptionIndex + 1}
+                      </td>
+                      <td className="border p-2 text-center space-x-2 text-xs sm:text-sm md:text-base">
+                        <button
+                          onClick={() => openEditModal(q)}
+                          className="bg-yellow-500 px-2 py-1 rounded hover:bg-yellow-600"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDelete(q._id)}
+                          className="bg-red-600 px-2 py-1 rounded hover:bg-red-700 text-white"
+                          disabled={deleting}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           )}
 
           <div className="mt-3">
@@ -310,7 +350,7 @@ export default function CertificationSetupWithAPI() {
                 setViewStep(null);
                 setViewLevel(null);
               }}
-              className="bg-gray-400 px-3 py-1 rounded hover:bg-gray-500"
+              className="bg-gray-400 px-3 py-1 rounded hover:bg-gray-500 text-xs sm:text-sm md:text-base"
             >
               Close
             </button>

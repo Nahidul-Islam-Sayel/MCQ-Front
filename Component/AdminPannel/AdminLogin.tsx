@@ -1,14 +1,16 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
-
+import { userContext } from "../../src/App";
 const MySwal = withReactContent(Swal);
 const primaryColor = "#122048";
 
 const AdminLoginForm: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [login, setLogin, checkadminlogin, setCheckAdminLogin] =
+    useContext(userContext);
   const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState<{
     email?: string;
@@ -71,7 +73,7 @@ const AdminLoginForm: React.FC = () => {
           timer: 2000,
           showConfirmButton: false,
         });
-
+        setCheckAdminLogin(true);
         setTimeout(() => {
           navigate("/adminhome");
         }, 2000);
@@ -183,7 +185,7 @@ const AdminLoginForm: React.FC = () => {
         )}
 
         {/* Forgot password link */}
-        <div className="mt-3 text-right">
+        {/* <div className="mt-3 text-right">
           <button
             type="button"
             className="text-sm text-blue-600 hover:underline focus:outline-none"
@@ -196,7 +198,7 @@ const AdminLoginForm: React.FC = () => {
           >
             Forgot Password?
           </button>
-        </div>
+        </div> */}
 
         {/* Submit Button */}
         <button

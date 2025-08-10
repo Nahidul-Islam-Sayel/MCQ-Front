@@ -19,7 +19,7 @@ const Login: React.FC = () => {
 
   const navigate = useNavigate();
 
-  // Step 1: handle initial login (send credentials and send OTP to email)
+  // --- existing login / otp flow (unchanged) ---
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -28,23 +28,18 @@ const Login: React.FC = () => {
     try {
       const res = await fetch("http://localhost:5000/StudentsSection/login", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         credentials: "include",
         body: JSON.stringify({ email, password }),
       });
 
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.error || "Login failed");
         setLoading(false);
         return;
       }
 
-      // Backend sends success response & OTP sent to email
-      // Now show OTP input form
       setOtpSent(true);
       setLoading(false);
 
@@ -63,7 +58,6 @@ const Login: React.FC = () => {
     }
   };
 
-  // Step 2: handle OTP verification
   const handleOtpVerify = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -74,23 +68,19 @@ const Login: React.FC = () => {
         "http://localhost:5000/StudentsSection/verify-otp",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           credentials: "include",
           body: JSON.stringify({ email, otp }),
         }
       );
 
       const data = await res.json();
-
       if (!res.ok) {
         setError(data.error || "OTP verification failed");
         setLoading(false);
         return;
       }
 
-      // OTP correct, backend sends tokens and userid
       const { accessToken, userid } = data;
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("userid", userid);
@@ -106,7 +96,6 @@ const Login: React.FC = () => {
 
       setLoading(false);
       setLogin(true);
-      console.log(login);
       navigate("/profile");
     } catch (err) {
       console.error(err);
@@ -115,9 +104,215 @@ const Login: React.FC = () => {
     }
   };
 
+  // ---------------------------
+  // Forgot password modal flow
+  // ---------------------------
+  const handleForgotPassword = async () => {
+    try {
+      // Step 1: ask for email
+      const { value: enteredEmail } = await MySwal.fire({
+        title: "Forgot Password",
+        input: "email",
+        inputLabel: "Enter your account email",
+        inputPlaceholder: "name@example.com",
+        showCancelButton: true,
+        confirmButtonText: "Send Code",
+        preConfirm: (val) => {
+          if (!val) {
+            MySwal.showValidationMessage("Email is required");
+          }
+          return val;
+        },
+      });
+
+      if (!enteredEmail) return; // user cancelled
+
+      // show loading
+      MySwal.fire({
+        title: "Sending code...",
+        didOpen: () => {
+          MySwal.showLoading();
+        },
+        allowOutsideClick: false,
+        showConfirmButton: false,
+      });
+
+      // Call backend to send code
+      const sendRes = await fetch(
+        "http://localhost:5000/StudentsSection/forgot-password",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: enteredEmail }),
+        }
+      );
+
+      const sendData = await sendRes.json();
+      MySwal.close();
+
+      if (!sendRes.ok) {
+        await MySwal.fire({
+          icon: "error",
+          title: "Error",
+          text: sendData.error || "Failed to send code",
+        });
+        return;
+      }
+
+      await MySwal.fire({
+        icon: "success",
+        title: "Code Sent",
+        text: "A verification code has been sent to your email.",
+        timer: 2000,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+
+      // Step 2: ask for code
+      const { value: enteredCode } = await MySwal.fire({
+        title: "Enter the code",
+        input: "text",
+        inputLabel: "6-digit code sent to your email",
+        inputPlaceholder: "Enter code",
+        showCancelButton: true,
+        confirmButtonText: "Verify Code",
+        inputValidator: (val) => {
+          if (!val) return "Code is required";
+          if (!/^\d{6}$/.test(val)) return "Enter a valid 6-digit code";
+          return null;
+        },
+      });
+
+      if (!enteredCode) return;
+
+      // Verify code on backend
+      MySwal.fire({
+        title: "Verifying code...",
+        didOpen: () => MySwal.showLoading(),
+        allowOutsideClick: false,
+        showConfirmButton: false,
+      });
+
+      const verifyRes = await fetch(
+        "http://localhost:5000/StudentsSection/verify-reset-code",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ email: enteredEmail, code: enteredCode }),
+        }
+      );
+      const verifyData = await verifyRes.json();
+      MySwal.close();
+
+      if (!verifyRes.ok) {
+        await MySwal.fire({
+          icon: "error",
+          title: "Invalid Code",
+          text: verifyData.error || "Code verification failed",
+        });
+        return;
+      }
+
+      await MySwal.fire({
+        icon: "success",
+        title: "Code Verified",
+        text: "You may now set a new password.",
+        timer: 1500,
+        showConfirmButton: false,
+      });
+
+      // Step 3: ask for new password & confirm
+      const { value: pwResult } = await MySwal.fire({
+        title: "Set New Password",
+        html:
+          `<input id="swal-new-pw" class="swal2-input" placeholder="New password" type="password">` +
+          `<input id="swal-confirm-pw" class="swal2-input" placeholder="Confirm password" type="password">`,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: "Update Password",
+        preConfirm: () => {
+          const newPw = (
+            document.getElementById("swal-new-pw") as HTMLInputElement
+          ).value;
+          const confirmPw = (
+            document.getElementById("swal-confirm-pw") as HTMLInputElement
+          ).value;
+          if (!newPw || !confirmPw) {
+            MySwal.showValidationMessage("Both fields are required");
+            return;
+          }
+          if (newPw.length < 6) {
+            MySwal.showValidationMessage(
+              "Password must be at least 6 characters"
+            );
+            return;
+          }
+          if (newPw !== confirmPw) {
+            MySwal.showValidationMessage("Passwords do not match");
+            return;
+          }
+          return { newPassword: newPw };
+        },
+      });
+
+      if (!pwResult) return; // cancelled
+
+      // call backend to set new password
+      MySwal.fire({
+        title: "Updating password...",
+        didOpen: () => MySwal.showLoading(),
+        allowOutsideClick: false,
+        showConfirmButton: false,
+      });
+
+      const resetRes = await fetch(
+        "http://localhost:5000/StudentsSection/reset-password-with-code",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: enteredEmail,
+            code: enteredCode,
+            newPassword: pwResult.newPassword,
+          }),
+        }
+      );
+
+      const resetData = await resetRes.json();
+      MySwal.close();
+
+      if (!resetRes.ok) {
+        await MySwal.fire({
+          icon: "error",
+          title: "Error",
+          text: resetData.error || "Failed to update password",
+        });
+        return;
+      }
+
+      await MySwal.fire({
+        icon: "success",
+        title: "Password Updated",
+        text: "Your password has been updated. Please login with the new password.",
+        timer: 2500,
+        timerProgressBar: true,
+        showConfirmButton: false,
+      });
+    } catch (err) {
+      console.error("Forgot password flow error:", err);
+      await MySwal.fire({
+        icon: "error",
+        title: "Error",
+        text: "Something went wrong. Try again.",
+      });
+    }
+  };
+
+  // ---------------------------
+  // JSX (same as your provided UI; only minor change: forgot password uses handler)
+  // ---------------------------
   return (
     <div className="min-h-screen flex flex-col md:flex-row bg-gray-50">
-      {/* Left Side - Image (hidden on mobile) */}
       <div
         className="hidden md:flex w-1/2 bg-cover bg-center"
         style={{ backgroundImage: `url(${loginImg})` }}
@@ -130,19 +325,17 @@ const Login: React.FC = () => {
         </div>
       </div>
 
-      {/* Right Side - Form */}
       <div className="w-full md:w-1/2 flex items-center justify-center px-4 sm:px-8 py-10 sm:py-12 lg:py-16 min-h-screen mt-10">
         <div className="bg-white w-full max-w-md rounded-2xl shadow-xl p-4 sm:p-6 md:p-8">
           <h2
             className="text-lg sm:text-2xl md:text-3xl lg:text-4xl font-bold text-center mb-6"
             style={{ color: primaryColor }}
           >
-            Admin Login
+            Login
           </h2>
 
           {!otpSent ? (
             <form onSubmit={handleLogin} className="space-y-5">
-              {/* Email */}
               <div>
                 <label
                   className="block mb-2 font-medium text-xs sm:text-sm md:text-base"
@@ -166,7 +359,6 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
-              {/* Password */}
               <div>
                 <label
                   className="block mb-2 font-medium text-xs sm:text-sm md:text-base"
@@ -190,25 +382,23 @@ const Login: React.FC = () => {
                 </div>
               </div>
 
-              {/* Forgot Password */}
               <div className="text-right">
-                <Link
-                  to="/forgot-password"
+                <button
+                  type="button"
+                  onClick={handleForgotPassword}
                   className="text-xs sm:text-sm md:text-base font-medium hover:underline"
                   style={{ color: primaryColor }}
                 >
                   Forgot Password?
-                </Link>
+                </button>
               </div>
 
-              {/* Error Message */}
               {error && (
                 <p className="text-red-600 text-center text-sm font-semibold">
                   {error}
                 </p>
               )}
 
-              {/* Submit */}
               <button
                 type="submit"
                 className={`w-full py-2 sm:py-3 rounded-lg text-white font-bold text-sm sm:text-lg lg:text-xl transition-transform transform hover:scale-105 ${
@@ -221,7 +411,6 @@ const Login: React.FC = () => {
               </button>
             </form>
           ) : (
-            // OTP Form
             <form onSubmit={handleOtpVerify} className="space-y-5">
               <div>
                 <label
@@ -273,7 +462,6 @@ const Login: React.FC = () => {
             </form>
           )}
 
-          {/* Sign Up Link */}
           {!otpSent && (
             <p className="text-center mt-6 text-gray-600 text-xs sm:text-sm md:text-base">
               Don’t have an account?{" "}
