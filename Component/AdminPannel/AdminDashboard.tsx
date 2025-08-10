@@ -98,10 +98,13 @@ const AdminHome: React.FC = () => {
       .then((data) => {
         setTotalVisit(data.length);
 
-        const countryCount = data.reduce((acc, { country = "Unknown" }) => {
-          acc[country] = (acc[country] || 0) + 1;
-          return acc;
-        }, {} as Record<string, number>);
+        const countryCount = data.reduce(
+          (acc: Record<string, number>, { country = "Unknown" }) => {
+            acc[country] = (acc[country] || 0) + 1;
+            return acc;
+          },
+          {} as Record<string, number>
+        );
 
         const [maxCountry, maxCount] = Object.entries(countryCount).reduce(
           (maxEntry, currentEntry) =>
