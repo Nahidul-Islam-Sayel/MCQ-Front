@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import {
   FaBars,
   FaChartBar,
@@ -12,10 +12,10 @@ import {
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
 import withReactContent from "sweetalert2-react-content";
+import { userContext } from "../../src/context/userContext";
 import QuestionSetup from "./QuestionSetup";
 import Reports from "./Reports";
 import VisitorAnalysis from "./VisitorAnalysis";
-
 interface CardProps {
   title: string;
   value: string | number;
@@ -44,6 +44,11 @@ const Card: React.FC<CardProps> = ({ title, value, icon }) => (
 const MySwal = withReactContent(Swal);
 
 const AdminHome: React.FC = () => {
+  const context = useContext(userContext);
+  if (!context) {
+    throw new Error("userContext must be used within a userContext.Provider");
+  }
+  const [, setCheckAdminLogin] = context;
   const [activeTab, setActiveTab] = useState<string>("Dashboard");
   const [totalUsers, setTotalUsers] = useState<number | null>(null);
   const [totalVisit, setTotalVisit] = useState<number | null>(null);
@@ -129,6 +134,7 @@ const AdminHome: React.FC = () => {
 
   const logout = () => {
     localStorage.clear();
+    setCheckAdminLogin(false);
     navigate("/");
     MySwal.fire("Logged Out", "You have been logged out", "success");
   };
