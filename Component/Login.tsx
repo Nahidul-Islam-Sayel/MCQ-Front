@@ -13,7 +13,7 @@ const Login: React.FC = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   // Added non-null assertion to satisfy TS if context might be undefined
-  const [login, setLogin] = useContext(userContext)!;
+  const [, setLogin] = useContext(userContext)!;
   const [otp, setOtp] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

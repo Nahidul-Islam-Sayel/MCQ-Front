@@ -33,7 +33,7 @@ export default function MCQStudentTestPage(): JSX.Element {
   const [name, setName] = useState<string>(
     () => localStorage.getItem("username") || ""
   );
-  const [email, setEmail] = useState<string>(
+  const [email] = useState<string>(
     () => localStorage.getItem("useremail") || ""
   );
   const userid = localStorage.getItem("userid") || undefined;
