@@ -15,6 +15,7 @@ import withReactContent from "sweetalert2-react-content";
 import QuestionSetup from "./QuestionSetup";
 import Reports from "./Reports";
 import VisitorAnalysis from "./VisitorAnalysis";
+
 interface CardProps {
   title: string;
   value: string | number;
@@ -26,7 +27,10 @@ interface MenuItem {
   icon: ReactNode;
 }
 
-// Card Component
+interface Visit {
+  country?: string; // optional because it might be missing
+}
+
 const Card: React.FC<CardProps> = ({ title, value, icon }) => (
   <div className="bg-white p-4 rounded-lg shadow flex items-center gap-4 w-full">
     <div className="text-3xl text-[#3E7CF5]">{icon}</div>
@@ -36,8 +40,6 @@ const Card: React.FC<CardProps> = ({ title, value, icon }) => (
     </div>
   </div>
 );
-
-// Tab Components
 
 const MySwal = withReactContent(Swal);
 
@@ -64,7 +66,6 @@ const AdminHome: React.FC = () => {
           value={totalVisit !== null ? totalVisit : "Loading..."}
           icon={<FaChartBar />}
         />
-
         <Card
           title="Top Visitor Country"
           value={
@@ -90,20 +91,21 @@ const AdminHome: React.FC = () => {
 
     fetch("https://mcq-back.onrender.com/SingUpAdmin/count")
       .then((res) => res.json())
-      .then((data) => setTotalUsers(data.totalUsers))
+      .then((data: { totalUsers: number }) => setTotalUsers(data.totalUsers))
       .catch((err) => console.error("Failed to fetch user count:", err));
 
     fetch("https://mcq-back.onrender.com/SingUpAdmin/visits")
       .then((res) => res.json())
-      .then((data) => {
+      .then((data: Visit[]) => {
         setTotalVisit(data.length);
 
-        const countryCount = data.reduce(
-          (acc: Record<string, number>, { country = "Unknown" }) => {
+        const countryCount = data.reduce<Record<string, number>>(
+          (acc, visit) => {
+            const country = visit.country ?? "Unknown";
             acc[country] = (acc[country] || 0) + 1;
             return acc;
           },
-          {} as Record<string, number>
+          {}
         );
 
         const [maxCountry, maxCount] = Object.entries(countryCount).reduce(
