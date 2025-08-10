@@ -26,7 +26,7 @@ const AdminResultsReport: React.FC = () => {
   const resultsPerPage = 10;
 
   useEffect(() => {
-    fetch("http://localhost:5000/StudentsExam/all-results")
+    fetch("https://mcq-back.onrender.com/StudentsExam/all-results")
       .then(async (res) => {
         if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
         return res.json();

@@ -59,7 +59,7 @@ const UserProfile: React.FC = () => {
       try {
         const accessToken = localStorage.getItem("accessToken");
         const res = await fetch(
-          `http://localhost:5000/StudentsProfile/user/${userid}`,
+          `https://mcq-back.onrender.com/StudentsProfile/user/${userid}`,
           {
             method: "GET",
             headers: {
@@ -101,7 +101,7 @@ const UserProfile: React.FC = () => {
     try {
       const accessToken = localStorage.getItem("accessToken");
       const res = await fetch(
-        `http://localhost:5000/StudentsExam/user-exams/${userid}`,
+        `https://mcq-back.onrender.com/StudentsExam/user-exams/${userid}`,
         {
           headers: {
             Authorization: `Bearer ${accessToken}`,
@@ -152,7 +152,7 @@ const UserProfile: React.FC = () => {
       setResetLoading(true);
       const accessToken = localStorage.getItem("accessToken");
       const res = await fetch(
-        "http://localhost:5000/StudentsSection/reset-password",
+        "https://mcq-back.onrender.com/StudentsSection/reset-password",
         {
           method: "POST",
           headers: {

@@ -87,12 +87,12 @@ const AdminHome: React.FC = () => {
       timer: 2000,
     });
 
-    fetch("http://localhost:5000/SingUpAdmin/count")
+    fetch("https://mcq-back.onrender.com/SingUpAdmin/count")
       .then((res) => res.json())
       .then((data) => setTotalUsers(data.totalUsers))
       .catch((err) => console.error("Failed to fetch user count:", err));
 
-    fetch("http://localhost:5000/SingUpAdmin/visits")
+    fetch("https://mcq-back.onrender.com/SingUpAdmin/visits")
       .then((res) => res.json())
       .then((data) => {
         setTotalVisit(data.length);

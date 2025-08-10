@@ -26,12 +26,15 @@ const Login: React.FC = () => {
     setError(null);
 
     try {
-      const res = await fetch("http://localhost:5000/StudentsSection/login", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ email, password }),
-      });
+      const res = await fetch(
+        "https://mcq-back.onrender.com/StudentsSection/login",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          credentials: "include",
+          body: JSON.stringify({ email, password }),
+        }
+      );
 
       const data = await res.json();
       if (!res.ok) {
@@ -65,7 +68,7 @@ const Login: React.FC = () => {
 
     try {
       const res = await fetch(
-        "http://localhost:5000/StudentsSection/verify-otp",
+        "https://mcq-back.onrender.com/StudentsSection/verify-otp",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -139,7 +142,7 @@ const Login: React.FC = () => {
 
       // Call backend to send code
       const sendRes = await fetch(
-        "http://localhost:5000/StudentsSection/forgot-password",
+        "https://mcq-back.onrender.com/StudentsSection/forgot-password",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -194,7 +197,7 @@ const Login: React.FC = () => {
       });
 
       const verifyRes = await fetch(
-        "http://localhost:5000/StudentsSection/verify-reset-code",
+        "https://mcq-back.onrender.com/StudentsSection/verify-reset-code",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -266,7 +269,7 @@ const Login: React.FC = () => {
       });
 
       const resetRes = await fetch(
-        "http://localhost:5000/StudentsSection/reset-password-with-code",
+        "https://mcq-back.onrender.com/StudentsSection/reset-password-with-code",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

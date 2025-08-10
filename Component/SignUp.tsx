@@ -12,7 +12,7 @@ import withReactContent from "sweetalert2-react-content";
 
 const MySwal = withReactContent(Swal);
 const primaryColor = "#122048";
-const API_BASE = "http://localhost:5000/StudentsSection";
+const API_BASE = "https://mcq-back.onrender.com/StudentsSection";
 
 interface FormData {
   name: string;

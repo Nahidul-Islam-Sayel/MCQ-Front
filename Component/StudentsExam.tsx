@@ -118,7 +118,7 @@ export default function MCQStudentTestPage(): JSX.Element {
     setLoading(true);
     try {
       const resp = await fetch(
-        `http://localhost:5000/exam/questions?step=${s}`
+        `https://mcq-back.onrender.com/exam/questions?step=${s}`
       );
       const data = await resp.json();
       const qs: Question[] = data.questions || [];
@@ -244,7 +244,7 @@ export default function MCQStudentTestPage(): JSX.Element {
     }));
 
     try {
-      const res = await fetch("http://localhost:5000/exam/submit", {
+      const res = await fetch("https://mcq-back.onrender.com/exam/submit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -282,7 +282,7 @@ export default function MCQStudentTestPage(): JSX.Element {
     if (!userid) return true;
     try {
       const resp = await fetch(
-        `http://localhost:5000/exam/latest-result?userId=${userid}&step=${step}`
+        `https://mcq-back.onrender.com/exam/latest-result?userId=${userid}&step=${step}`
       );
       const data = await resp.json();
       if (data.result) {
@@ -413,7 +413,7 @@ export default function MCQStudentTestPage(): JSX.Element {
         {certificateUrl && (
           <div className="mt-3">
             <a
-              href={`http://localhost:5000${certificateUrl}`}
+              href={`https://mcq-back.onrender.com${certificateUrl}`}
               target="_blank"
               rel="noreferrer"
               className="px-4 py-2 bg-blue-600 text-white rounded text-base sm:text-lg md:text-xl inline-block"

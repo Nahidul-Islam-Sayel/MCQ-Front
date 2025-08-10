@@ -44,7 +44,7 @@ const Home: React.FC = () => {
     fetch("https://api.ipify.org?format=json")
       .then((res) => res.json())
       .then((data) => {
-        fetch("http://localhost:5000/SingUpAdmin/track-visit", {
+        fetch("https://mcq-back.onrender.com/SingUpAdmin/track-visit", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ ip: data.ip }),

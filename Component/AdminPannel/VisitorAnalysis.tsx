@@ -26,7 +26,7 @@ const Analysis: React.FC = () => {
 
   useEffect(() => {
     setLoading(true);
-    fetch("http://localhost:5000/SingUpAdmin/visits")
+    fetch("https://mcq-back.onrender.com/SingUpAdmin/visits")
       .then((res) => res.json())
       .then((data: Visit[]) => {
         setVisits(data);

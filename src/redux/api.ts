@@ -42,7 +42,7 @@ const axiosBaseQuery =
 export const api = createApi({
   reducerPath: "api",
   baseQuery: axiosBaseQuery({
-    baseUrl: "http://localhost:5000/AdminAddQuestion/",
+    baseUrl: "https://mcq-back.onrender.com/AdminAddQuestion/",
   }),
   tagTypes: ["Questions", "Count"],
   endpoints: (build) => ({

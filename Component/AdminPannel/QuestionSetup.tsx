@@ -61,7 +61,7 @@ export default function CertificationSetupWithAPI() {
         ASSESSMENT_FLOW.map(async (item) => {
           // Using fetch manually because RTK Query can't be used outside hooks here
           const resp = await fetch(
-            `http://localhost:5000/AdminAddQuestion/count?step=${item.step}&level=${item.level}`
+            `https://mcq-back.onrender.com/AdminAddQuestion/count?step=${item.step}&level=${item.level}`
           );
           if (!resp.ok) {
             counts[keyFor(item.step, item.level)] = 0;
